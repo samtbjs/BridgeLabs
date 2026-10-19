@@ -13,7 +13,7 @@ from .engine import parse_pdf, build_report
 from .market import ROLES, collect_market
 from .pdf_report import generate_pdf, generate_summary_pdf
 
-app = FastAPI(title='BridgeLabs curriculum analysis')
+app = FastAPI(title='Delta curriculum analysis')
 # Allow local development previews to use the local API; do not enable arbitrary websites.
 app.add_middleware(
     CORSMiddleware,
@@ -78,7 +78,7 @@ def download_pdf(report_id: str, version: Literal['full', 'summary'] = 'full'):
             REPORTS.pop(report_id, None)
             raise HTTPException(404, 'Report expired or unavailable. Run the analysis again to download a fresh PDF.')
         pdf = saved[1][version]
-    filename = 'bridgelabs-executive-summary.pdf' if version == 'summary' else 'bridgelabs-analysis.pdf'
+    filename = 'delta-executive-summary.pdf' if version == 'summary' else 'delta-analysis.pdf'
     return Response(pdf, media_type='application/pdf', headers={
         'Content-Disposition': f'attachment; filename="{filename}"',
         'Cache-Control': 'no-store',

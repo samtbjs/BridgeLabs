@@ -59,7 +59,7 @@ def generate_pdf(report):
         if co: p(f"Possible original outcome link (faculty review): {co['id']} - {co['statement']} (p.{co['page']})")
         else: p('No explicit course outcome mapping found.', small)
     market, curriculum, summary = report['market'], report['curriculum'], report['summary']
-    p('BRIDGELABS / CURRICULUM-TO-CAREER', sub)
+    p('DELTA / CURRICULUM-TO-CAREER', sub)
     p('Your curriculum.\nYour next steps.', title)
     p(report.get('filename', 'Curriculum report'), sub)
     p(f"Role: {report['role']} | Market: {market.get('focus', 'International')}")
@@ -146,11 +146,11 @@ def generate_pdf(report):
         canvas.saveState()
         canvas.setStrokeColor(colors.HexColor('#dfe6da')); canvas.line(52,46,A4[0]-52,46)
         canvas.setFont('BridgeSans',8); canvas.setFillColor(MUTED)
-        canvas.drawString(52,32,'BridgeLabs / Curriculum analysis')
+        canvas.drawString(52,32,'Delta / Curriculum analysis')
         canvas.drawRightString(A4[0]-52,32,f'Page {doc.page}')
         canvas.restoreState()
     doc = SimpleDocTemplate(output, pagesize=A4, rightMargin=52, leftMargin=52, topMargin=48, bottomMargin=62,
-                            title='BridgeLabs - Curriculum and job market analysis', author='BridgeLabs')
+                            title='Delta - Curriculum and job market analysis', author='Delta')
     doc.build(story, onFirstPage=footer, onLaterPages=footer)
     return output.getvalue()
 
@@ -178,7 +178,7 @@ def generate_summary_pdf(report):
             ('LINEBELOW',(0,0),(-1,-1),.4,colors.HexColor('#e1e6dc'))]))
         story.extend([grid,Spacer(1,8)])
     stats, market, curriculum = report['summary'], report['market'], report['curriculum']
-    p('BRIDGELABS / DECISION BRIEF', small)
+    p('DELTA / DECISION BRIEF', small)
     p('Executive Summary', title)
     p(clip(report.get('filename', 'Curriculum analysis'),100))
     p(f"Role: {clip(report['role'],60)} | International job sample", small)
@@ -227,8 +227,8 @@ def generate_summary_pdf(report):
     p('The full report includes original curriculum excerpts, course outcomes, complete skill-demand tables, all gap mappings, detailed lab rubrics, job links, source failures, and methodology. This two-page brief intentionally omits that detail.',small)
     def footer(canvas,doc):
         canvas.saveState();canvas.setFillColor(MUTED);canvas.setFont('BridgeSans',8)
-        canvas.drawString(52,32,'BridgeLabs / Executive Summary')
+        canvas.drawString(52,32,'Delta / Executive Summary')
         canvas.drawRightString(A4[0]-52,32,f'{doc.page} / 2');canvas.restoreState()
     SimpleDocTemplate(output,pagesize=A4,leftMargin=52,rightMargin=52,topMargin=44,bottomMargin=55,
-        title='BridgeLabs - Executive Summary',author='BridgeLabs').build(story,onFirstPage=footer,onLaterPages=footer)
+        title='Delta - Executive Summary',author='Delta').build(story,onFirstPage=footer,onLaterPages=footer)
     return output.getvalue()

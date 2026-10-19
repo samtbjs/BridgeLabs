@@ -70,8 +70,8 @@ function renderReport(r, apiBase) {
  <details><summary>How this report is calculated and its limits</summary><p>${esc(r.methodology)}</p>${bullets(r.limitations)}</details>
  `;
  for (const [id, version, filename] of [
-   ['download-report', 'full', 'bridgelabs-analysis.pdf'],
-   ['download-summary', 'summary', 'bridgelabs-executive-summary.pdf']
+   ['download-report', 'full', 'delta-analysis.pdf'],
+   ['download-summary', 'summary', 'delta-executive-summary.pdf']
  ]) {
    $(id).onclick = () => {
      const a = document.createElement('a');
@@ -95,7 +95,7 @@ async function resolveAnalysisServer(signal) {
    } catch (error) { if (signal.aborted) throw error; }
  }
  throw new Error(loopback || window.location.protocol === 'file:'
-   ? 'Cannot reach BridgeLabs analysis. From the BridgeLabs folder, run: .venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000, then retry. You can also open http://127.0.0.1:8000.'
+   ? 'Cannot reach Delta analysis. From the project folder, run: .venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000, then retry. You can also open http://127.0.0.1:8000.'
    : 'The analysis service is temporarily unavailable or starting up. Please retry in a moment.');
 }
 analyze.addEventListener('click', async () => {

@@ -158,7 +158,7 @@ def test_report_download_is_valid_pdf_and_expires(monkeypatch):
     report_id = result.json()['report_id']
     response = client.get(f'/api/reports/{report_id}.pdf')
     assert response.headers['content-type'] == 'application/pdf'
-    assert 'bridgelabs-analysis.pdf' in response.headers['content-disposition']
+    assert 'delta-analysis.pdf' in response.headers['content-disposition']
     assert response.content.startswith(b'%PDF-')
     with pdfplumber.open(BytesIO(response.content)) as pdf:
         text = '\n'.join(p.extract_text() or '' for p in pdf.pages)
@@ -166,7 +166,7 @@ def test_report_download_is_valid_pdf_and_expires(monkeypatch):
         assert section in text
     summary_response = client.get(f'/api/reports/{report_id}.pdf?version=summary')
     assert summary_response.headers['content-type'] == 'application/pdf'
-    assert 'bridgelabs-executive-summary.pdf' in summary_response.headers['content-disposition']
+    assert 'delta-executive-summary.pdf' in summary_response.headers['content-disposition']
     with pdfplumber.open(BytesIO(summary_response.content)) as summary_pdf:
         assert len(summary_pdf.pages) == 2
         summary_text = '\n'.join(p.extract_text() or '' for p in summary_pdf.pages)

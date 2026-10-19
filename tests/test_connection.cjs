@@ -28,7 +28,7 @@ test('backend-hosted frontend uses its own origin', async () => {
 });
 test('HTML responses produce actionable connection error', async () => {
  const resolve = setup(async () => ({ok:true, headers:new Headers({'content-type':'text/html'})}));
- await assert.rejects(resolve(new AbortController().signal), /Cannot reach BridgeLabs analysis/);
+ await assert.rejects(resolve(new AbortController().signal), /Cannot reach Delta analysis/);
 });
 test('hosted websites never automatically send data to loopback backend', async () => {
  const urls = [];

@@ -1,4 +1,4 @@
-# BridgeLabs
+# Delta
 
 Curriculum-to-career workspace with a FastAPI backend and the existing vanilla HTML/CSS/JavaScript interface. Upload a searchable syllabus PDF to compare its skill mentions with an international entry-level job sample collected using JobSpy.
 
@@ -56,43 +56,3 @@ node --test tests/test_connection.cjs
 Tests use generated searchable PDFs and controlled job fixtures; they do not depend on changing external boards. Use an actual PDF in the UI to exercise live collection. This is a local prototype: before public deployment add authentication, request-body limits at a reverse proxy, rate limits, and retention controls. Only static assets are exposed; project files and dependencies are not served.
 
 JobSpy documentation: https://github.com/speedyapply/JobSpy
-
-
-## Deploy with a public URL (Render)
-
-The repository includes `render.yaml` and `.python-version`. The configuration runs the Python backend and website together, so uploads and both PDF downloads work on one HTTPS address. Deploy this as a **Web Service**, not a Static Site. No frontend build or separate Firebase project is needed.
-
-1. Commit the current project, including `backend/`, `requirements.txt`, `render.yaml`, and `.python-version`, and push it to your GitHub repository. Keep `.venv/`, `.env`, and uploaded PDFs out of Git.
-2. Sign in at https://dashboard.render.com and select **New > Blueprint**.
-3. Connect the BridgeLabs repository and select the branch containing these changes. If BridgeLabs is inside a larger repository, put the Blueprint at that repository's root and set the service's `rootDir` to the BridgeLabs subdirectory first. The supplied configuration assumes BridgeLabs is the repository root.
-4. Review the configuration and deploy. The supplied plan is **Free**; check the displayed plan before confirming. Render will install Python dependencies and start the service.
-5. Open the actual `https://<assigned-service-name>.onrender.com` URL shown by Render. The assigned name may differ from `bridgelabs`. This is your shareable URL; localhost addresses are only for your computer.
-6. Check `/api/health` on that URL, upload a small searchable PDF, run an analysis, and test both the full-report and Executive Summary downloads. A successful health check proves the service is running, not that every job board is reachable.
-
-If you create a Web Service manually instead of using a Blueprint, use:
-
-| Setting | Value |
-| --- | --- |
-| Runtime | Python 3 |
-| Build command | `python -m pip install -r requirements.txt` |
-| Start command | `python -m uvicorn backend.main:app --host 0.0.0.0 --port $PORT --workers 1` |
-| Health check | `/api/health` |
-| Environment variable | `JOBSPY_WORKERS=2` |
-| Instances | 1 |
-
-Render reads Python `3.14.6` from `.python-version`, matching the local test environment. Keep **one API worker and one instance**: PDFs and market results currently live in process memory. More instances or API workers require shared report storage/cache first. Do not use `--reload` in the hosted start command.
-
-The frontend uses the hosting site's own `/api` endpoints automatically. No hardcoded public API URL or broad CORS rule is required. Local preview fallback remains available only when the page is served from localhost.
-
-### Hosting limits to consider
-
-- Free Render services sleep after 15 minutes without inbound traffic and take time to wake up. Open the site before demonstrating it. Restarting, sleeping, or redeploying clears cached reports; users must rerun analysis before downloading again.
-- The free instance has limited memory and CPU. Two scrape workers reduce peak memory compared with four, but this is not a guarantee that large PDFs or every search will fit. If logs show memory exhaustion or repeated timeouts, use a larger instance, reduce `JOBSPY_WORKERS` to 1, or move collection to a background job. Lower concurrency can mean fewer sources finish within the existing 70-second collection budget.
-- Job boards can block cloud/datacenter IPs or throttle requests. A working public URL does not guarantee JobSpy coverage. Inspect the report's source diagnostics on the hosted service; if the chosen host is blocked, address the data provider/access method rather than hiding the failure or inventing sample results.
-- This configuration is for a small demonstration of the current prototype. The existing concurrency limits do not provide user authentication or per-user rate limiting. For broader public use, add those controls and shared durable report storage before scaling.
-
-### Why not Firebase Hosting alone?
-
-Firebase Hosting serves static files; this app also needs a Python backend. Hosting rewrites to Cloud Run/Functions have a 60-second request timeout, shorter than the current 70-second job collection budget plus parsing and PDF generation. A direct Cloud Run service is a viable Google Cloud alternative, but the current in-memory reports require one instance/worker or shared storage. Render avoids splitting the frontend and backend for this first deployment.
-
-References: [Render FastAPI deployment](https://render.com/docs/deploy-fastapi), [Python version selection](https://render.com/docs/python-version), [Render free-service limits](https://render.com/docs/free), [Firebase dynamic-content limits](https://firebase.google.com/docs/hosting/serverless-overview).
