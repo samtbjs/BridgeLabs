@@ -33,6 +33,6 @@ test('HTML responses produce actionable connection error', async () => {
 test('hosted websites never automatically send data to loopback backend', async () => {
  const urls = [];
  const resolve = setup(async url => {urls.push(url); return {ok:false};}, 'https://example.org');
- await assert.rejects(resolve(new AbortController().signal));
+ await assert.rejects(resolve(new AbortController().signal), /temporarily unavailable/);
  assert.deepEqual(urls,['https://example.org/api/health']);
 });

@@ -94,7 +94,9 @@ async function resolveAnalysisServer(signal) {
      if (health.status === 'ok' && health.service === 'bridgelabs') return base;
    } catch (error) { if (signal.aborted) throw error; }
  }
- throw new Error('Cannot reach BridgeLabs analysis. From the BridgeLabs folder, run: .venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000, then retry. You can also open http://127.0.0.1:8000.');
+ throw new Error(loopback || window.location.protocol === 'file:'
+   ? 'Cannot reach BridgeLabs analysis. From the BridgeLabs folder, run: .venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000, then retry. You can also open http://127.0.0.1:8000.'
+   : 'The analysis service is temporarily unavailable or starting up. Please retry in a moment.');
 }
 analyze.addEventListener('click', async () => {
  if (!selectedFile || busy) return;
@@ -113,7 +115,7 @@ analyze.addEventListener('click', async () => {
    if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail : 'Please check the PDF and selected search options.');
    renderReport(data, base); $('analysis-status').textContent = 'Analysis complete. Review the evidence and data-quality notes below.';
  } catch (error) {
-   $('error').textContent = error.name === 'AbortError' ? 'Analysis timed out. Retry shortly; a completed market search may now be cached.' : (error.message === 'Failed to fetch' ? 'Cannot reach the analysis server. Start the Python server and retry.' : error.message);
+   $('error').textContent = error.name === 'AbortError' ? 'Analysis timed out. Retry shortly; a completed market search may now be cached.' : (error.message === 'Failed to fetch' ? 'The connection to the analysis service was interrupted. Check your connection and retry.' : error.message);
    $('analysis-status').textContent = '';
  } finally {
    clearTimeout(timeout); busy = false; analyze.disabled = !selectedFile; $('remove-file').disabled = false; input.disabled = false; drop.removeAttribute('aria-disabled');

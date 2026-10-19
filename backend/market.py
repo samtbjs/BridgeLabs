@@ -3,6 +3,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import date, datetime, timedelta, timezone
 import hashlib
 import multiprocessing
+import os
 import re
 import threading
 import time
@@ -100,7 +101,13 @@ def collect_market(role):
                 CACHE.pop(stale_key)
         records, statuses, warnings = [], [], []
         ctx = multiprocessing.get_context('spawn')
-        pool = ProcessPoolExecutor(max_workers=4, mp_context=ctx)
+        try:
+            worker_count = int(os.environ.get('JOBSPY_WORKERS', '4'))
+        except ValueError:
+            raise ValueError('JOBSPY_WORKERS must be an integer from 1 to 4.') from None
+        if not 1 <= worker_count <= 4:
+            raise ValueError('JOBSPY_WORKERS must be an integer from 1 to 4.')
+        pool = ProcessPoolExecutor(max_workers=worker_count, mp_context=ctx)
         futures = {pool.submit(scrape_board, board, ROLES[role][0], country): (board, country) for board, country in SEARCHES}
         completed = set()
         try:

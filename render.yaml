@@ -1,0 +1,17 @@
+# Deploy as a Render Web Service, not a Static Site.
+services:
+  - type: web
+    name: bridgelabs
+    runtime: python
+    plan: free
+    region: singapore
+    numInstances: 1
+    buildCommand: python -m pip install -r requirements.txt
+    # One API worker: market and PDF caches live in this process.
+    startCommand: python -m uvicorn backend.main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: JOBSPY_WORKERS
+        value: "2"

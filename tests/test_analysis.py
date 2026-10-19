@@ -110,9 +110,10 @@ def test_naukri_experience_range_filters_senior_and_keeps_junior():
 def test_collection_partial_failure_and_cache(monkeypatch):
     import backend.market as module
     module.CACHE.clear()
+    monkeypatch.setenv('JOBSPY_WORKERS', '2')
     calls = []
     class Pool:
-        def __init__(self, **kwargs): pass
+        def __init__(self, **kwargs): assert kwargs['max_workers'] == 2
         def submit(self, fn, board, query, country):
             from concurrent.futures import Future
             future = Future()
